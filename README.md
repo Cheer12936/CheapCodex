@@ -42,10 +42,10 @@ Worker: 大文件阅读、信息提取、文档/测试/配置草稿
 
 ### 方式一：让 Codex 自己安装
 
-把下面这段话发给 Codex。把 `YOUR_NAME` 换成你的 GitHub 用户名或组织名。
+把下面这段话发给 Codex。
 
 ```text
-Install https://github.com/YOUR_NAME/codex-cheap-worker into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
+Install https://github.com/Cheer12936/CheapCodex into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
 更详细的可复制提示词见 [CODEX-INSTALL-PROMPT.md](CODEX-INSTALL-PROMPT.md)。
@@ -53,7 +53,7 @@ Install https://github.com/YOUR_NAME/codex-cheap-worker into my Codex setup. Use
 ### 方式二：PowerShell 一键安装
 
 ```powershell
-$dir="$env:USERPROFILE\codex-cheap-worker"; if (Test-Path $dir) { git -C $dir pull } else { git clone https://github.com/YOUR_NAME/codex-cheap-worker.git $dir }; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
+$dir="$env:USERPROFILE\codex-cheap-worker"; if (Test-Path $dir) { git -C $dir pull } else { git clone https://github.com/Cheer12936/CheapCodex.git $dir }; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
 ```
 
 安装脚本会自动：
@@ -99,7 +99,7 @@ Ollama 本地模型:
 Windows:
 
 ```powershell
-git clone https://github.com/YOUR_NAME/codex-cheap-worker.git
+git clone https://github.com/Cheer12936/CheapCodex.git
 cd codex-cheap-worker
 .\scripts\install.ps1
 .\.venv\Scripts\Activate.ps1
@@ -108,7 +108,7 @@ cd codex-cheap-worker
 macOS / Linux:
 
 ```bash
-git clone https://github.com/YOUR_NAME/codex-cheap-worker.git
+git clone https://github.com/Cheer12936/CheapCodex.git
 cd codex-cheap-worker
 bash scripts/install.sh
 source .venv/bin/activate
@@ -276,4 +276,3 @@ draft-worker: 16384
 ## License
 
 MIT
-

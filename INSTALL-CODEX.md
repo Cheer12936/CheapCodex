@@ -7,7 +7,7 @@ This is the easiest path for users who want Codex to automatically use the worke
 Use a normal PowerShell window:
 
 ```powershell
-git clone https://github.com/YOUR_NAME/codex-cheap-worker.git
+git clone https://github.com/Cheer12936/CheapCodex.git
 cd codex-cheap-worker
 .\scripts\install-codex.ps1 -Provider deepseek
 ```
@@ -30,7 +30,7 @@ Users can also ask Codex to do the setup. Give them the copy-paste prompt in [CO
 Short prompt:
 
 ```text
-Install https://github.com/YOUR_NAME/codex-cheap-worker into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
+Install https://github.com/Cheer12936/CheapCodex into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
 ## Provider Examples
@@ -83,8 +83,8 @@ Codex still handles reasoning, verification, architecture decisions, subtle debu
 
 ## One-Line Installer For A Published Repo
 
-After replacing the URL with your actual GitHub repo, users can run:
+Users can run:
 
 ```powershell
-$dir="$env:USERPROFILE\codex-cheap-worker"; git clone https://github.com/YOUR_NAME/codex-cheap-worker.git $dir; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
+$dir="$env:USERPROFILE\codex-cheap-worker"; git clone https://github.com/Cheer12936/CheapCodex.git $dir; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
 ```

@@ -2,12 +2,10 @@
 
 Give users this prompt when they want Codex to install the project for them.
 
-Replace `YOUR_NAME` with your GitHub username or organization.
-
 ```text
 Please install this Codex Cheap Worker project into my local Codex setup:
 
-https://github.com/YOUR_NAME/codex-cheap-worker
+https://github.com/Cheer12936/CheapCodex
 
 Use the repository's installer script instead of manually recreating the setup.
 
@@ -26,7 +24,7 @@ Requirements:
 ## Short Version
 
 ```text
-Install https://github.com/YOUR_NAME/codex-cheap-worker into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
+Install https://github.com/Cheer12936/CheapCodex into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
 ## One-Line PowerShell Alternative
@@ -34,6 +32,5 @@ Install https://github.com/YOUR_NAME/codex-cheap-worker into my Codex setup. Use
 For users who do not want Codex to do it:
 
 ```powershell
-$dir="$env:USERPROFILE\codex-cheap-worker"; if (Test-Path $dir) { git -C $dir pull } else { git clone https://github.com/YOUR_NAME/codex-cheap-worker.git $dir }; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
+$dir="$env:USERPROFILE\codex-cheap-worker"; if (Test-Path $dir) { git -C $dir pull } else { git clone https://github.com/Cheer12936/CheapCodex.git $dir }; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
 ```
-
