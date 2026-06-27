@@ -1,0 +1,54 @@
+# Codex Cheap Worker Delegation
+
+Use these tools when they are available on PATH:
+
+- `ask-worker`: delegate bulk reading and focused extraction to a cheaper worker model.
+- `draft-worker`: generate draft files under `.worker-drafts/` for review before applying.
+
+## When To Delegate
+
+Use `ask-worker` instead of reading raw files directly when:
+
+- a task requires reading files over roughly 400 lines;
+- a task requires scanning 3 or more files;
+- the user asks for inventory, summaries, dependency lists, endpoint lists, exported API lists, or documentation deltas;
+- the answer can be based on a concise structured summary.
+
+Example:
+
+```bash
+ask-worker --paths "src/**/*.ts" "README.md" --question "List public APIs and the files that define them"
+```
+
+Use `draft-worker` for boilerplate:
+
+- test skeletons;
+- configuration files;
+- docs drafts;
+- repetitive adapters or wrappers.
+
+Example:
+
+```bash
+draft-worker --context "tests/**/*.py" --target "tests/test_auth.py" --spec "Write pytest coverage for auth login failures"
+```
+
+Review the draft before applying it. Prefer editing with Codex after the worker produces the draft.
+
+## When Not To Delegate
+
+Do not delegate:
+
+- architecture decisions;
+- subtle debugging;
+- security-sensitive code;
+- files that may contain credentials, customer data, private keys, or unreleased confidential material;
+- work that needs exact line-by-line edits;
+- tasks under roughly 2,000 tokens of total context.
+
+If exact line numbers are required, either pass `--line-numbers` to `ask-worker` or read the relevant file directly after the worker narrows the area.
+
+## Review Rule
+
+Treat worker output as a fast assistant, not source of truth. Verify important claims against the actual repository before making final edits.
+

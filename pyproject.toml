@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codex-cheap-worker"
+version = "0.1.0"
+description = "CLI tools that let Codex delegate bulk reading and boilerplate drafts to a cheaper OpenAI-compatible worker model."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Codex Cheap Worker" }
+]
+dependencies = [
+  "openai>=1.40.0"
+]
+
+[project.scripts]
+codex-worker = "codex_cheap_worker.cli:main"
+ask-worker = "codex_cheap_worker.cli:ask_main"
+draft-worker = "codex_cheap_worker.cli:draft_main"
+worker-health = "codex_cheap_worker.cli:health_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
