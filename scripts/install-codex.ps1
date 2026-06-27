@@ -6,7 +6,8 @@ param(
     [string]$ApiKey = "",
     [string]$VenvPath = ".venv",
     [switch]$SkipAgentRules,
-    [switch]$SessionOnly
+    [switch]$SessionOnly,
+    [switch]$NonInteractive
 )
 
 $ErrorActionPreference = "Stop"
@@ -68,6 +69,20 @@ function Read-SecretValue {
             [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
         }
     }
+}
+
+function Get-ExistingWorkerApiKey {
+    $processKey = [Environment]::GetEnvironmentVariable("WORKER_API_KEY", "Process")
+    if (-not [string]::IsNullOrWhiteSpace($processKey)) {
+        return $processKey
+    }
+
+    $userKey = [Environment]::GetEnvironmentVariable("WORKER_API_KEY", "User")
+    if (-not [string]::IsNullOrWhiteSpace($userKey)) {
+        return $userKey
+    }
+
+    return ""
 }
 
 function Set-WorkerEnv {
@@ -183,6 +198,12 @@ if ([string]::IsNullOrWhiteSpace($ApiKey)) {
     if (-not [string]::IsNullOrWhiteSpace($defaults.ApiKeyDefault)) {
         $ApiKey = $defaults.ApiKeyDefault
     }
+    elseif (-not [string]::IsNullOrWhiteSpace((Get-ExistingWorkerApiKey))) {
+        $ApiKey = Get-ExistingWorkerApiKey
+    }
+    elseif ($NonInteractive) {
+        throw "Missing WORKER_API_KEY. Set it first or pass -ApiKey before running install-codex.ps1 -NonInteractive."
+    }
     else {
         $ApiKey = Read-SecretValue -Prompt "Enter $($defaults.ApiKeyLabel)"
     }
@@ -209,15 +230,13 @@ Write-Host "Provider: $Provider"
 Write-Host "WORKER_BASE_URL=$BaseUrl"
 Write-Host "WORKER_MODEL=$Model"
 Write-Host "WORKER_API_KEY is set, but not printed."
-Write-Host "Command shims: $(Join-Path $repoRoot 'bin')"
+Write-Host "Command shims were added to the user PATH."
 if ($agentsPath) {
     Write-Host "Codex rules: $agentsPath"
 }
 Write-Host ""
 Write-Host "Verify:"
-$healthCmd = Join-Path $repoRoot "bin\worker-health.cmd"
-$askWorkerCmd = Join-Path $repoRoot "bin\ask-worker.cmd"
-Write-Host ('  & "{0}"' -f $healthCmd)
-Write-Host ('  & "{0}" --paths README.md --question "Summarize this tool in one sentence" --dry-run' -f $askWorkerCmd)
+Write-Host "  worker-health"
+Write-Host '  ask-worker --paths README.md --question "Summarize this tool in one sentence" --dry-run'
 Write-Host ""
 Write-Host "Restart Codex so it reloads AGENTS.md and user environment variables."

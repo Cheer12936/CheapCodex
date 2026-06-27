@@ -11,8 +11,9 @@ Use the repository's installer script instead of manually recreating the setup.
 
 Requirements:
 - Clone or update the repository under my user home directory.
-- Run scripts/install-codex.ps1 with Provider deepseek.
-- Prompt me for the DeepSeek API key if needed, but do not print it.
+- Check whether WORKER_API_KEY already exists in my Windows user environment.
+- If WORKER_API_KEY is missing, stop and ask me to configure a DeepSeek API key first. Do not run an interactive hidden prompt that can hang.
+- Run scripts/install-codex.ps1 with Provider deepseek. Use -NonInteractive when WORKER_API_KEY already exists.
 - Install the Python CLI tools.
 - Configure WORKER_API_KEY, WORKER_BASE_URL, and WORKER_MODEL for my Windows user environment.
 - Add the project's bin directory to my user PATH.
@@ -24,7 +25,7 @@ Requirements:
 ## Short Version
 
 ```text
-Install https://github.com/Cheer12936/CheapCodex into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
+Install https://github.com/Cheer12936/CheapCodex into my Codex setup. First check that WORKER_API_KEY exists; if it is missing, ask me to configure my DeepSeek key and stop. If it exists, run scripts/install-codex.ps1 -Provider deepseek -NonInteractive, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
 ## One-Line PowerShell Alternative

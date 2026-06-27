@@ -30,7 +30,7 @@ Users can also ask Codex to do the setup. Give them the copy-paste prompt in [CO
 Short prompt:
 
 ```text
-Install https://github.com/Cheer12936/CheapCodex into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
+Install https://github.com/Cheer12936/CheapCodex into my Codex setup. First check that WORKER_API_KEY exists; if it is missing, ask me to configure my DeepSeek key and stop. If it exists, run scripts/install-codex.ps1 -Provider deepseek -NonInteractive, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
 ## Provider Examples

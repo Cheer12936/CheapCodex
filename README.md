@@ -45,7 +45,7 @@ Worker: 大文件阅读、信息提取、文档/测试/配置草稿
 把下面这段话发给 Codex。
 
 ```text
-Install https://github.com/Cheer12936/CheapCodex into my Codex setup. Use scripts/install-codex.ps1 -Provider deepseek, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
+Install https://github.com/Cheer12936/CheapCodex into my Codex setup. First check that WORKER_API_KEY exists; if it is missing, ask me to configure my DeepSeek key and stop. If it exists, run scripts/install-codex.ps1 -Provider deepseek -NonInteractive, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
 更详细的可复制提示词见 [CODEX-INSTALL-PROMPT.md](CODEX-INSTALL-PROMPT.md)。
