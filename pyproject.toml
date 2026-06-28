@@ -21,7 +21,7 @@ codex-worker = "codex_cheap_worker.cli:main"
 ask-worker = "codex_cheap_worker.cli:ask_main"
 draft-worker = "codex_cheap_worker.cli:draft_main"
 worker-health = "codex_cheap_worker.cli:health_main"
+cheapcodex-benchmark = "codex_cheap_worker.benchmark:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

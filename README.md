@@ -35,6 +35,7 @@ Worker: 大文件阅读、信息提取、文档/测试/配置草稿
 - `ask-worker`: 读取多个文件或 glob，向 worker 模型提问，返回结构化摘要。
 - `draft-worker`: 根据参考文件生成草稿，默认写入 `.worker-drafts/`，不会直接覆盖源码。
 - `worker-health`: 检查 worker 配置、模型、API key 和 token 默认值。
+- `cheapcodex-benchmark`: 估算和验证 worker 对 Codex 上下文的压缩效果。
 - `AGENTS.md.template`: Codex 的 worker 路由规则模板。
 - `scripts/install-codex.ps1`: 一键安装到本机 Codex。
 
@@ -146,6 +147,20 @@ ask-worker --paths "src/**/*.py" --question "总结模块职责" --max-tokens 40
 ```
 
 ## 使用示例
+
+Benchmark，不消耗 API token：
+
+```powershell
+cheapcodex-benchmark --paths "src/**/*.py" "README.md"
+```
+
+真实调用 worker 的 benchmark：
+
+```powershell
+cheapcodex-benchmark --paths "src/**/*.py" "README.md" --live --max-tokens 2048
+```
+
+更多说明见 [BENCHMARK.md](BENCHMARK.md)。
 
 先 dry-run，不消耗 API token：
 

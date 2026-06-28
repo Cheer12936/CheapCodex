@@ -246,5 +246,6 @@ Write-Host ""
 Write-Host "Verify:"
 Write-Host "  worker-health"
 Write-Host '  ask-worker --paths README.md --question "Summarize this tool in one sentence" --dry-run'
+Write-Host '  cheapcodex-benchmark --paths README.md src/**/*.py'
 Write-Host ""
 Write-Host "Restart Codex so it reloads AGENTS.md and user environment variables."
