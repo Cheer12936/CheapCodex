@@ -132,7 +132,7 @@ function Install-AgentRules {
 <!-- codex-cheap-worker:start -->
 ## Cheap Worker Delegation
 
-Use the Codex Cheap Worker tools when a task is mostly bulk reading, focused extraction, summarization, or boilerplate drafting.
+Use the Codex Cheap Worker tools when a task is mostly bulk reading, focused extraction, summarization, impact analysis, or boilerplate drafting.
 
 Preferred commands:
 
@@ -144,13 +144,21 @@ Delegate to ask-worker before reading raw files directly when:
 - a task requires reading files over roughly 400 lines;
 - a task requires scanning 3 or more files;
 - the user asks for inventories, summaries, endpoint lists, exported API lists, documentation deltas, or cross-file mapping;
+- entering an unfamiliar repository and the relevant files are unknown;
+- a feature request may span multiple modules and Codex needs a project map first;
+- estimating blast radius before changing an API, schema, function, route, or shared utility;
+- finding call sites, references, routes, tests, config files, or documentation related to a change;
+- comparing docs with source code to detect stale documentation;
+- summarizing logs, generated reports, or long command outputs before deciding what to inspect;
+- learning test style from existing tests before drafting new tests;
+- preparing changelog, release notes, PR descriptions, or migration notes from multiple files or diffs;
 - the worker can return a concise summary that Codex can verify.
 
-Use draft-worker for boilerplate drafts such as tests, docs, config files, repetitive adapters, or wrappers. By default it writes drafts under .worker-drafts/; review the draft before applying it to source files.
+Use draft-worker for boilerplate drafts such as tests, docs, config files, repetitive adapters, wrappers, changelog entries, release notes, PR descriptions, or migration notes. By default it writes drafts under .worker-drafts/; review the draft before applying it to source files.
 
 Do not delegate architecture decisions, subtle debugging, security-sensitive code, files likely to contain secrets, small tasks under roughly 2,000 tokens, or exact line-by-line edits unless ask-worker --line-numbers is used first to narrow the area.
 
-Treat worker output as a fast assistant, not source of truth. Verify important claims against the repository before final edits.
+Treat worker output as a fast assistant, not source of truth. After receiving worker output, read the smallest relevant original files before editing. Do not edit code based only on worker summaries.
 <!-- codex-cheap-worker:end -->
 "@
 
