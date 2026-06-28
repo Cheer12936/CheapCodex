@@ -4,6 +4,8 @@ This benchmark measures what CheapCodex is designed to save: Codex-side context.
 
 It does not claim that total tokens disappear. The worker still spends tokens reading files. The useful metric is how much raw local code can be compressed before Codex reads it.
 
+For a recorded synthetic full-stack benchmark and bug-fix case study, see [BENCHMARK-RESULTS.md](BENCHMARK-RESULTS.md).
+
 ## Dry Run
 
 Dry-run mode does not call the worker model:
@@ -59,4 +61,3 @@ codex_context_reduction_estimate
 ```
 
 This shows the practical effect: Codex can read a short worker summary plus a few verified source files instead of loading every scanned file into its own context.
-

@@ -162,6 +162,8 @@ cheapcodex-benchmark --paths "src/**/*.py" "README.md" --live --max-tokens 2048
 
 更多说明见 [BENCHMARK.md](BENCHMARK.md)。
 
+实测结果和跨文件 bug 修复案例见 [BENCHMARK-RESULTS.md](BENCHMARK-RESULTS.md)。
+
 先 dry-run，不消耗 API token：
 
 ```powershell
