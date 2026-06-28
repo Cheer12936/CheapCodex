@@ -1,4 +1,4 @@
-# Codex Cheap Worker
+# Cheap Codex
 
 给 Codex 配一个便宜的“阅读同事”：让 DeepSeek、Kimi、Qwen、Ollama 等 OpenAI-compatible 模型负责大文件阅读、跨文件摘要和样板草稿，Codex 继续负责判断、验证和最终修改。
 
