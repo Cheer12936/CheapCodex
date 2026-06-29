@@ -1,6 +1,6 @@
 # Cheap Codex
 
-给 Codex 配一个便宜的代码阅读助手。
+**给 Codex 配一个便宜的实习生。**
 
 CheapCodex 让 DeepSeek、Kimi、Qwen、Ollama 等 OpenAI-compatible 模型先去做“大范围阅读、摘要、定位、草稿”，Codex 继续负责判断、验证和最终改代码。
 
