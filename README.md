@@ -1,55 +1,46 @@
 # Cheap Codex
 
-给 Codex 配一个便宜的“阅读同事”：让 DeepSeek、Kimi、Qwen、Ollama 等 OpenAI-compatible 模型负责大文件阅读、跨文件摘要和样板草稿，Codex 继续负责判断、验证和最终修改。
+给 Codex 配一个便宜的代码阅读助手。
 
-这个项目的目标不是替代 Codex，而是减少 Codex 在“读很多文件”上消耗的上下文。
+CheapCodex 让 DeepSeek、Kimi、Qwen、Ollama 等 OpenAI-compatible 模型先去做“大范围阅读、摘要、定位、草稿”，Codex 继续负责判断、验证和最终改代码。
 
-## 核心思路
+它不是 Codex 的替代品，而是把“读很多文件但只需要少量结论”的工作，从 Codex 主上下文里移出去。
 
 ```text
-Codex: 推理、判断、验证、最终改代码
-Worker: 大文件阅读、信息提取、文档/测试/配置草稿
+大量源码 / 日志 / 文档
+        |
+        v
+Cheap Worker: 扫描、提取、总结、草稿
+        |
+        v
+Codex: 判断、复核原文件、修改、测试
 ```
 
-当任务需要扫很多文件时，Codex 不必把所有源码都读进自己的上下文，而是先调用 worker 模型生成结构化摘要，再基于摘要做决策。
+## 适合谁
 
-## 适合什么场景
+如果你的 Codex 经常卡在这些场景，CheapCodex 会比较有用：
 
-- 梳理项目结构、模块职责、数据流
-- 扫描多个文件找接口、路由、endpoint、定时任务
-- 总结大文件或多个文件的关键信息
-- 起草测试、配置文件、README、接口文档
-- 让 Codex 在实现功能前先定位相关代码
+| 场景 | Worker 做什么 | Codex 做什么 |
+| --- | --- | --- |
+| 第一次进入陌生项目 | 扫目录、总结模块、找关键入口 | 判断从哪里开始改 |
+| 一个需求可能跨多个文件 | 找路由、接口、调用链、测试位置 | 复核关键文件并实现 |
+| 日志、源码、测试一起分析 | 先归纳可疑点和证据 | 验证根因并修 bug |
+| 写测试、文档、配置 | 生成样板草稿 | 审核、调整、落到源码 |
+| 大文件只需要结论 | 提取重点、行号、风险点 | 读取最小必要上下文 |
 
-不适合：
+一句话：**读很多，改一点** 的项目最适合。
 
-- 架构决策
-- 复杂 bug 推理
-- 安全敏感代码
-- 含密钥、客户数据、私钥的文件
-- 很小的改动
-- 需要逐行精确修改的任务
+## 快速安装
 
-## 功能
+### 方式一：让 Codex 自动安装
 
-- `ask-worker`: 读取多个文件或 glob，向 worker 模型提问，返回结构化摘要。
-- `draft-worker`: 根据参考文件生成草稿，默认写入 `.worker-drafts/`，不会直接覆盖源码。
-- `worker-health`: 检查 worker 配置、模型、API key 和 token 默认值。
-- `cheapcodex-benchmark`: 估算和验证 worker 对 Codex 上下文的压缩效果。
-- `AGENTS.md.template`: Codex 的 worker 路由规则模板。
-- `scripts/install-codex.ps1`: 一键安装到本机 Codex。
-
-## 最快安装方式
-
-### 方式一：让 Codex 自己安装
-
-把下面这段话发给 Codex。
+把下面这段话发给 Codex：
 
 ```text
 Install https://github.com/Cheer12936/CheapCodex into my Codex setup. First check that WORKER_API_KEY exists; if it is missing, ask me to configure my DeepSeek key and stop. If it exists, run scripts/install-codex.ps1 -Provider deepseek -NonInteractive, configure the global AGENTS.md worker rules, and verify worker-health plus ask-worker dry-run.
 ```
 
-更详细的可复制提示词见 [CODEX-INSTALL-PROMPT.md](CODEX-INSTALL-PROMPT.md)。
+更完整的复制版见 [CODEX-INSTALL-PROMPT.md](CODEX-INSTALL-PROMPT.md)。
 
 ### 方式二：PowerShell 一键安装
 
@@ -57,69 +48,146 @@ Install https://github.com/Cheer12936/CheapCodex into my Codex setup. First chec
 $dir="$env:USERPROFILE\codex-cheap-worker"; if (Test-Path $dir) { git -C $dir pull } else { git clone https://github.com/Cheer12936/CheapCodex.git $dir }; cd $dir; .\scripts\install-codex.ps1 -Provider deepseek
 ```
 
-安装脚本会自动：
+安装脚本会自动完成：
 
-- 创建 `.venv`
-- 安装 CLI 工具
-- 交互式输入 API key，不会打印 key
+- 创建 Python `.venv`
+- 安装 `ask-worker` / `draft-worker` / `worker-health`
 - 配置 `WORKER_API_KEY`、`WORKER_BASE_URL`、`WORKER_MODEL`
 - 把项目 `bin\` 加入用户 PATH
 - 写入或更新 `%USERPROFILE%\.codex\AGENTS.md`
-- 运行验证命令
+- 运行 `worker-health` 和 dry-run 验证
 
-安装完成后，重启 Codex。
+安装后重启 Codex，让全局 `AGENTS.md` 生效。
 
-## Provider 示例
+## 常用命令
 
-DeepSeek:
-
-```powershell
-.\scripts\install-codex.ps1 -Provider deepseek
-```
-
-Kimi:
+检查配置：
 
 ```powershell
-.\scripts\install-codex.ps1 -Provider kimi
+worker-health
 ```
 
-Ollama 本地模型:
+先 dry-run，不消耗 API token：
 
 ```powershell
-.\scripts\install-codex.ps1 -Provider ollama
+ask-worker --paths "src/**/*.py" "README.md" --question "总结项目架构" --dry-run
 ```
 
-自定义 OpenAI-compatible endpoint:
+让 worker 扫多个文件：
 
 ```powershell
-.\scripts\install-codex.ps1 -Provider custom -BaseUrl "https://example.com/v1" -Model "your-model"
+ask-worker --paths "backend/**/*.js" "frontend/src/**/*.jsx" --question "梳理前后端数据流"
 ```
 
-## 手动安装
-
-Windows:
+需要行号时：
 
 ```powershell
-git clone https://github.com/Cheer12936/CheapCodex.git
-cd codex-cheap-worker
-.\scripts\install.ps1
-.\.venv\Scripts\Activate.ps1
+ask-worker --paths "backend/**/*.js" --question "找出用户认证相关代码在哪里" --line-numbers
 ```
 
-macOS / Linux:
+生成草稿，默认写到 `.worker-drafts/`，不会直接覆盖源码：
 
-```bash
-git clone https://github.com/Cheer12936/CheapCodex.git
-cd codex-cheap-worker
-bash scripts/install.sh
-source .venv/bin/activate
+```powershell
+draft-worker --context "tests/**/*.py" "src/auth.py" --target "tests/test_auth.py" --spec "写 pytest，覆盖登录失败和 token 过期"
 ```
 
-## 配置
+估算压缩效果：
 
-环境变量：
+```powershell
+cheapcodex-benchmark --paths "src/**/*.py" "README.md"
+```
 
-| 变量 | 默认值 | 说明 |
+真实调用 worker 的 benchmark：
+
+```powershell
+cheapcodex-benchmark --paths "src/**/*.py" "README.md" --live --max-tokens 2048
+```
+
+真实调用后，命令末尾会显示 token 使用量：
+
+```text
+[worker: 1300 in (1280 cached) / 36 out | finish: stop]
+```
+
+其中 `in` 是输入 token，`cached` 是模型侧缓存命中，`out` 是输出 token。
+
+## Codex 会什么时候用它
+
+安装脚本会把 worker 路由规则写入：
+
+```text
+%USERPROFILE%\.codex\AGENTS.md
+```
+
+默认建议 Codex 在这些情况下优先调用 `ask-worker`：
+
+- 需要读取超过约 400 行的文件
+- 需要扫描 3 个以上文件
+- 需要项目结构图、接口清单、endpoint 清单、跨文件映射
+- 进入陌生仓库，需要先找相关模块
+- 修改 API、schema、函数、路由、共享工具前，需要估算影响范围
+- 对比文档和源码是否过期
+- 总结长日志、测试报告、生成报告
+- 学习现有测试风格，再写新测试
+
+默认建议 Codex 在这些情况下使用 `draft-worker`：
+
+- 起草测试
+- 起草 README、接口文档、变更说明
+- 起草配置文件、适配器、重复 wrapper
+- 起草 PR 描述、release notes、migration notes
+
+关键原则：**worker 输出只是线索，不是事实来源。Codex 在编辑前仍要读取最小必要原文件。**
+
+## 不建议使用的场景
+
+这些情况不应该交给外部 worker：
+
+- 架构决策
+- 复杂且细节敏感的 bug 推理
+- 安全敏感代码
+- 密钥、客户数据、私钥、内部未公开资料
+- 很小的单文件改动
+- 需要联网搜索最新资料、价格、法规、外部 GitHub 项目对比
+
+如果你使用第三方 API，文件内容会发送给对应服务商。更重视隐私时，优先使用本地 Ollama 或公司批准的内部模型。
+
+## Benchmark
+
+我们用一个模拟的复杂全栈项目做了实测，包含后端路由、controller、service、utils、前端页面、API client、测试、文档和日志。
+
+| 测试场景 | 文件数 | 原始输入 token | Worker 输出 token | Codex 侧阅读压缩 |
+| --- | ---: | ---: | ---: | ---: |
+| 项目结构梳理 | 26 | 25,093 | 539 | 97.9% |
+| 登录与刷新链路 | 9 | 8,378 | 453 | 94.6% |
+| Token TTL 影响面 | 27 | 25,223 | 557 | 97.8% |
+| 学习测试风格 | 4 | 5,895 | 434 | 92.6% |
+
+还做了一个跨文件 bug 定位测试：
+
+```text
+RefundPage.jsx
+  -> refundApi.createRefund()
+  -> refundRoutes.js
+  -> refundController.createRefund()
+  -> refundService.refundOrder()
+  -> money.calculateRefundCents()
+```
+
+worker 用 8 个相关文件定位到根因：
+
+```diff
+- return Math.round(raw * 100);
++ return Math.round(raw);
+```
+
+Codex 随后复核原文件、确认测试期望和日志证据，再完成修复验证。
+
+完整测试过程见 [BENCHMARK-RESULTS.md](BENCHMARK-RESULTS.md)，测试方法见 [BENCHMARK.md](BENCHMARK.md)。
+
+## 配置项
+
+| 环境变量 | 默认值 | 说明 |
 | --- | --- | --- |
 | `WORKER_API_KEY` | 无 | worker 模型 API key |
 | `WORKER_BASE_URL` | `https://api.moonshot.ai/v1` | OpenAI-compatible API 地址 |
@@ -146,103 +214,39 @@ setx WORKER_TEMPERATURE "0.1"
 ask-worker --paths "src/**/*.py" --question "总结模块职责" --max-tokens 4096 --max-total-bytes 1000000
 ```
 
-## 使用示例
+## 支持的模型服务
 
-Benchmark，不消耗 API token：
-
-```powershell
-cheapcodex-benchmark --paths "src/**/*.py" "README.md"
-```
-
-真实调用 worker 的 benchmark：
+安装脚本内置了常用 provider：
 
 ```powershell
-cheapcodex-benchmark --paths "src/**/*.py" "README.md" --live --max-tokens 2048
+.\scripts\install-codex.ps1 -Provider deepseek
+.\scripts\install-codex.ps1 -Provider kimi
+.\scripts\install-codex.ps1 -Provider ollama
 ```
 
-更多说明见 [BENCHMARK.md](BENCHMARK.md)。
-
-实测结果和跨文件 bug 修复案例见 [BENCHMARK-RESULTS.md](BENCHMARK-RESULTS.md)。
-
-先 dry-run，不消耗 API token：
+也可以连接任意 OpenAI-compatible endpoint：
 
 ```powershell
-ask-worker --paths "src/**/*.py" "README.md" --question "总结项目架构" --dry-run
+.\scripts\install-codex.ps1 -Provider custom -BaseUrl "https://example.com/v1" -Model "your-model"
 ```
 
-让 worker 扫描多个文件：
+## 文档入口
 
-```powershell
-ask-worker --paths "backend/**/*.js" "frontend/src/**/*.jsx" --question "梳理前后端数据流"
-```
+- [INSTALL-CODEX.md](INSTALL-CODEX.md): 安装到 Codex 的详细步骤
+- [CODEX-INSTALL-PROMPT.md](CODEX-INSTALL-PROMPT.md): 给用户复制的 Codex 安装提示词
+- [BENCHMARK.md](BENCHMARK.md): benchmark 命令和方法
+- [BENCHMARK-RESULTS.md](BENCHMARK-RESULTS.md): 实测结果和 bug 定位案例
+- [AGENTS.md.template](AGENTS.md.template): 写入 Codex 的 worker 调用规则模板
 
-需要行号时：
+## 项目边界
 
-```powershell
-ask-worker --paths "backend/**/*.js" --question "找出用户认证相关代码在哪里" --line-numbers
-```
+CheapCodex 的价值不是“自动替你写对所有代码”，而是让 Codex 少读无关上下文，更快找到应该亲自复核的文件。
 
-生成测试草稿：
-
-```powershell
-draft-worker --context "tests/**/*.py" "src/auth.py" --target "tests/test_auth.py" --spec "写 pytest，覆盖登录失败和 token 过期"
-```
-
-默认会写到：
+推荐工作流：
 
 ```text
-.worker-drafts/tests/test_auth.py
+worker 广泛阅读
+Codex 阅读摘要
+Codex 打开关键原文件
+Codex 修改和测试
 ```
-
-然后让 Codex 审核和应用。
-
-## Codex 会什么时候调用 worker
-
-安装脚本会把规则写入：
-
-```text
-%USERPROFILE%\.codex\AGENTS.md
-```
-
-规则大意：
-
-- 读超过约 400 行的大文件时，优先用 `ask-worker`
-- 扫 3 个以上文件时，优先用 `ask-worker`
-- 做项目摘要、接口清单、endpoint 清单、跨文件映射时，优先用 `ask-worker`
-- 生成测试、文档、配置、重复样板代码时，优先用 `draft-worker`
-- Codex 必须复核 worker 输出，不能把 worker 输出当作事实来源
-
-## Token 使用
-
-真实调用后会打印 token 使用量：
-
-```text
-[worker: 1300 in (1280 cached) / 36 out | finish: stop]
-```
-
-含义：
-
-- `1300 in`: 输入 token
-- `1280 cached`: 命中的缓存 token
-- `36 out`: 输出 token
-- `finish`: 模型结束原因
-
-默认输出上限对齐原项目思路：
-
-```text
-ask-worker: 8192
-draft-worker: 16384
-```
-
-对于 thinking 模型，`max_tokens` 需要覆盖模型内部推理和最终答案，所以不要设得太低。
-
-## 安全边界
-
-默认安全策略：
-
-- 常见 `API_KEY`、`TOKEN`、`SECRET`、`PASSWORD` 行会被保守脱敏
-- 二进制文件会跳过
-- 大文件会按上限截断
-- 草稿默认写入 `.worker-drafts/`，不会覆盖源码
-
-仍然要注意：如果你使用第三方 API，文件内容会发送给对应服务商。私有代码、客户数据、密钥文件和安全敏感文件不要委托给外部 worker。需要更强隐私时，优先使用本地 Ollama 或公司批准的内部模型。
