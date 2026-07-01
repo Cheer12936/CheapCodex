@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -39,7 +40,25 @@ class CliHelpersTest(unittest.TestCase):
             self.assertIn("source.py", corpus)
             self.assertIn("1: def f():", corpus)
 
+    def test_build_corpus_uses_relative_paths_inside_cwd(self):
+        original_cwd = Path.cwd()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_dir = root / "src"
+            source_dir.mkdir()
+            text_path = source_dir / "source.py"
+            text_path.write_text("def f():\n    return 1\n", encoding="utf-8")
+
+            try:
+                os.chdir(root)
+                payloads = read_payloads([text_path])
+                corpus = build_corpus(payloads)
+            finally:
+                os.chdir(original_cwd)
+
+            self.assertIn('path="src/source.py"', corpus)
+            self.assertNotIn(str(root), corpus)
+
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -107,11 +107,20 @@ def with_line_numbers(text: str) -> str:
     return "\n".join(f"{idx:5d}: {line}" for idx, line in enumerate(text.splitlines(), start=1))
 
 
+def prompt_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        display_path = resolved.relative_to(Path.cwd().resolve())
+    except ValueError:
+        display_path = resolved
+    return display_path.as_posix()
+
+
 def build_corpus(payloads: Sequence[FilePayload], *, line_numbers: bool = False) -> str:
     blocks: list[str] = []
     for payload in payloads:
         body = with_line_numbers(payload.text) if line_numbers else payload.text
-        attrs = f'path="{payload.path}" bytes="{payload.bytes_read}"'
+        attrs = f'path="{prompt_path(payload.path)}" bytes="{payload.bytes_read}"'
         if payload.truncated:
             attrs += ' truncated="true"'
         blocks.append(f"<file {attrs}>\n{body}\n</file>")
@@ -384,7 +393,7 @@ def print_dry_run(name: str, payloads: Sequence[FilePayload], corpus: str) -> No
     print(f"rough_tokens: {max(len(corpus) // 4, 1)}")
     for payload in payloads:
         suffix = " truncated" if payload.truncated else ""
-        print(f"- {payload.path} ({payload.bytes_read} bytes{suffix})")
+        print(f"- {prompt_path(payload.path)} ({payload.bytes_read} bytes{suffix})")
 
 
 def health(args: argparse.Namespace) -> int:
